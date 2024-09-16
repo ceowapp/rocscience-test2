@@ -1,0 +1,75 @@
+# Web Debugging Challenge 2 - README
+
+This document outlines the fixes applied to resolve issues in the Web Debugging Challenge 2 project.
+
+## Issues and Fixes
+
+### 1. Typo in server.js script
+
+**Problem:**
+There was a typo in the route handler for the '/sighting' endpoint.
+
+**Fix:**
+Changed:
+```javascript
+app.get('/sighting', SightingCtrl.raed);
+```
+To:
+```javascript
+app.get('/sighting', SightingCtrl.read);
+```
+
+### 2. Mongoose Update
+
+**Problem:**
+The project was using an outdated version of Mongoose which led to compatibility issues.
+
+**Fix:**
+Updated Mongoose to the latest version:
+```
+npm install mongoose@latest
+```
+
+### 3. Mongoose Query Execution
+
+**Problem:**
+After updating Mongoose, an error occurred due to the use of callbacks in query execution:
+```
+C:\Users\DELL 7510\Omnibus\Test2\web-debugging-challenges\challenge2\node_modules\mongoose\lib\query.js:4353
+    throw new MongooseError('Query.prototype.exec() no longer accepts a callback');
+```
+
+**Fix:**
+Updated controller methods to use async/await instead of callbacks. For example:
+
+```javascript
+// Before
+exports.read = function(req, res) {
+  Sighting.find({}, function(err, sightings) {
+    if (err) return res.status(500).send(err);
+    return res.send(sightings);
+  });
+};
+
+// After
+exports.read = async function(req, res) {
+  try {
+    const sightings = await Sighting.find({});
+    return res.send(sightings);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+};
+```
+
+## Approach and Reasoning
+
+1. **Typo Fix**: The typo in the route handler was a simple spelling error. Correcting 'raed' to 'read' ensures that the correct controller method is called when the '/sighting' endpoint is accessed.
+
+2. **Mongoose Update**: Updating to the latest version of Mongoose is generally a good practice to ensure compatibility with the latest Node.js versions and to benefit from the latest features and bug fixes.
+
+3. **Async/Await Implementation**: The error message indicated that Mongoose no longer supports callbacks in query execution. Switching to async/await syntax is the recommended approach for handling asynchronous operations in modern JavaScript. This change makes the code more readable and easier to maintain, while also resolving the compatibility issue with the latest Mongoose version.
+
+4. **API Testing**: To ensure the functionality of our API endpoints after applying the fixes, I conducted API testing using Postman. All API tests passed successfully. The endpoint correctly returns excepted response, and proper error handling is in place for invalid requests.
+
+
