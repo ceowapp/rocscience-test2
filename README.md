@@ -1,6 +1,6 @@
 # Web Debugging Challenge 2 - README
 
-This document outlines the fixes applied to resolve issues in the Web Debugging Challenge 2 project.
+This document outlines the issues encountered and fixes applied to resolve problems in the Web Debugging Challenge 2 project.
 
 ## Issues and Fixes
 
@@ -19,10 +19,10 @@ To:
 app.get('/sighting', SightingCtrl.read);
 ```
 
-### 2. Mongoose Update
+### 2. Outdated Mongoose Version
 
 **Problem:**
-The project was using an outdated version of Mongoose which led to compatibility issues.
+The project was using an outdated version of Mongoose, leading to compatibility issues.
 
 **Fix:**
 Updated Mongoose to the latest version:
@@ -62,14 +62,52 @@ exports.read = async function(req, res) {
 };
 ```
 
+### 4. Deprecated Method
+
+**Problem:**
+After updating Mongoose, `findByIdAndRemove` is deprecated.
+
+**Fix:**
+Updated the method to use `findByIdAndDelete`. For example:
+
+```javascript
+// Before
+delete: async function(req, res) {
+    try {
+        const result = await User.findByIdAndRemove(req.params.id);
+        if (!result) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+        res.send(result);
+    } catch (err) {
+        res.status(500).send({ message: 'Internal Server Error', error: err.message });
+    }
+}
+
+// After
+delete: async function(req, res) {
+    try {
+        const result = await User.findByIdAndDelete(req.params.id);
+        if (!result) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+        res.send(result);
+    } catch (err) {
+        res.status(500).send({ message: 'Internal Server Error', error: err.message });
+    }
+}
+```
+
 ## Approach and Reasoning
 
 1. **Typo Fix**: The typo in the route handler was a simple spelling error. Correcting 'raed' to 'read' ensures that the correct controller method is called when the '/sighting' endpoint is accessed.
 
 2. **Mongoose Update**: Updating to the latest version of Mongoose is generally a good practice to ensure compatibility with the latest Node.js versions and to benefit from the latest features and bug fixes.
 
-3. **Async/Await Implementation**: The error message indicated that Mongoose no longer supports callbacks in query execution. Switching to async/await syntax is the recommended approach for handling asynchronous operations in modern JavaScript. This change makes the code more readable and easier to maintain, while also resolving the compatibility issue with the latest Mongoose version.
+3. **Async/Await Implementation**: The error message indicated that Mongoose no longer supports callbacks in query execution. Switching to async/await syntax is the recommended approach for handling asynchronous operations in modern JavaScript. This change makes the code more readable and easier to maintain while also resolving the compatibility issue with the latest Mongoose version.
 
-4. **API Testing**: To ensure the functionality of our API endpoints after applying the fixes, I conducted API testing using Postman. All API tests passed successfully. The endpoint correctly returns excepted response, and proper error handling is in place for invalid requests.
+4. **Deprecated Method Update**: Replacing `findByIdAndRemove` with `findByIdAndDelete` ensures compatibility with the latest Mongoose version and follows best practices for database operations.
 
+## Testing
 
+To ensure the functionality of our API endpoints after applying the fixes, API testing was conducted using Postman. All API tests passed successfully. The endpoints correctly return expected responses, and proper error handling is in place for invalid requests.
