@@ -32,7 +32,7 @@ module.exports = {
 
     delete: async function (req, res) {
         try {
-            const result = await Sighting.findByIdAndRemove(req.params.id);
+            const result = await Sighting.findByIdAndDelete(req.params.id);
             res.send(result);
         } catch (err) {
             res.status(500).send(err);
